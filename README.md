@@ -14,6 +14,7 @@
 cd /usr/local/openresty/site/lualib
 git clone https://github.com/k8scat/lua-resty-http.git
 git clone https://github.com/k8scat/lua-resty-jwt.git
+git clone https://github.com/jkeys089/lua-resty-hmac.git
 git clone https://github.com/k8scat/lua-resty-weauth.git
 ```
 
@@ -23,7 +24,7 @@ git clone https://github.com/k8scat/lua-resty-weauth.git
 
 ```conf
 http {
-    lua_package_path "/usr/local/openresty/site/lualib/lua-resty-weauth/lib/?.lua;/usr/local/openresty/site/lualib/lua-resty-jwt/lib/?.lua;/usr/local/openresty/site/lualib/lua-resty-jwt/vendor/?.lua;/usr/local/openresty/site/lualib/lua-resty-http/lib/?.lua;;";
+    lua_package_path "/usr/local/openresty/site/lualib/lua-resty-weauth/lib/?.lua;/usr/local/openresty/site/lualib/lua-resty-hmac/lib/?.lua;/usr/local/openresty/site/lualib/lua-resty-jwt/lib/?.lua;/usr/local/openresty/site/lualib/lua-resty-jwt/vendor/?.lua;/usr/local/openresty/site/lualib/lua-resty-http/lib/?.lua;;";
 }
 ```
 
@@ -42,8 +43,8 @@ server {
     ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
     ssl_ciphers AESGCM:HIGH:!aNULL:!MD5;
     ssl_prefer_server_ciphers  on;
-    lua_ssl_verify_depth 2;
-    lua_ssl_trusted_certificate /etc/pki/tls/certs/ca-bundle.crt;
+    lua_ssl_verify_depth 2; #非必须
+    lua_ssl_trusted_certificate /etc/pki/tls/certs/ca-bundle.crt; #非必须
     if ($time_iso8601 ~ "^(\d{4})-(\d{2})-(\d{2})T(\d{2})") {
         set $year $1;
         set $month $2;
@@ -64,7 +65,7 @@ server {
         weauth.jwt_secret = "thisisjwtsecret"
 
         weauth.ip_blacklist = {"47.1.2.3"}
-        weauth.uri_whitelist = {"/"}
+        weauth.uri_whitelist = {"/js","/static/"} #不验证的路径示例
         weauth.department_whitelist = {1, 2}
 
         weauth:auth()
