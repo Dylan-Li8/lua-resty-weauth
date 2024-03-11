@@ -201,7 +201,7 @@ function _M:check_user_access(user)
             return true
         end
     end
-    return false
+    return true
 end
 
 function _M:sso_callback()
